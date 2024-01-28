@@ -1,8 +1,12 @@
 package com.example.todolist
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
+
+import androidx.appcompat.app.AlertDialog
+
 
 class MainActivity : AppCompatActivity() {
     var itemList = ArrayList<String>()
@@ -17,10 +21,32 @@ class MainActivity : AppCompatActivity() {
         android.R.id.text1, itemList)
         lvCongViec.adapter = arrayAdapter
 
+
         btnAdd.setOnClickListener {
             var itemName = edtInput.text.toString()
             itemList.add(itemName)
             edtInput.setText("")
+            fileHelper.writeData(itemList, applicationContext)
+            arrayAdapter.notifyDataSetChanged()
+        }
+
+//        xoa item
+        lvCongViec.setOnItemClickListener { parent, view, position, id ->
+            var alert = AlertDialog.Builder(this)
+            alert.setTitle("Delete")
+            alert.setMessage("Bạn đã hoàn thành công việc, nhấn yes để xóa!")
+            alert.setCancelable(true)
+            alert.setPositiveButton("Yes", DialogInterface.OnClickListener { diglog, which ->
+                itemList.removeAt(position)
+                arrayAdapter.notifyDataSetChanged()
+//                ghi danh sach moi vao tep khach hang
+                fileHelper.writeData(itemList, applicationContext)
+            })
+            alert.setNegativeButton("No", DialogInterface.OnClickListener { diglog, which ->
+               diglog.cancel()
+            })
+            alert.create()
+            alert.show()
         }
     }
 }
